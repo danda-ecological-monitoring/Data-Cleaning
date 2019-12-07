@@ -1,5 +1,0 @@
-SET SQL_SAFE_UPDATES = 0;
-update PurpleAir
- SET Sensor = TRIM(TRAILING '\r' FROM Sensor);
-
-SET SQL_SAFE_UPDATES = 1;
