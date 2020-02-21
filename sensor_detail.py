@@ -12,7 +12,7 @@ import pandas as pd
 ##Constants #################################################################################################
 DESTINATION_TIME_ZONE = 'Asia/Kathmandu'
 
-#############################################################################################################
+#####################s########################################################################################
 ##Helper Functions ##########################################################################################
 ##Should include unit transforms, date reformats, etc #######################################################
 ##Whatever applies directly to the data #####################################################################
@@ -58,19 +58,19 @@ class LaserEggFormat(SensorFormat):
 		return df
 
 class PurpleAirFormat(SensorFormat):
-	raw_colummns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
-		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'ADC', \
+	raw_columns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
+		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'RSSI_dbm', \
 		'Temperature_F','Humidity_%', 'PM2.5_CF_1_ug/m3'})
 	formatted_columns = ExpectedColumns({'Time', 'entry_id', 'PM1.0', 'PM2.5', 'PM10.0', \
-		'Uptime', 'ADC','Temperature', 'Humidity', 'PM2.5B'})
+		'Uptime', 'ADC','Temperature', 'Humidity', 'PM2.5_ATM'})
 	column_map = {'created_at':'Time', \
 				'Temperature_F':'Internal_Temperature', \
-				'PM1.0_CF_ATM_ug/m3':'PM1.0',\
-				'PM2.5_CF_ATM_ug/m3':'PM2.5',\
-				'PM10.0_CF_ATM_ug/m3':'PM10.0',\
+				'PM1.0_CF1_ug/m3':'PM1.0',\
+				'PM2.5_CF1_ug/m3':'PM2.5',\
+				'PM10.0_CF1_ug/m3':'PM10.0',\
 				'Humidity_%':'Humidity',\
 				'UptimeMinutes':'Uptime',\
-				'PM2.5_CF_1_ug/m3':'PM2.5B'}
+				r'PM2.5_ATM_ug/m3':'PM2.5_ATM'}
 	time_zone = 'UTC'
 	sensor_key = "purple air"
 
