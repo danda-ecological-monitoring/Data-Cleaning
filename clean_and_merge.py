@@ -25,11 +25,12 @@ import format as f
 import sensor_detail as sd
 import os
 import regex
+from db_connect import bulk_upload
 
 #input
 sensor_dict = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\sensor_dict.txt" # this is a map of sensor names and ids
 data_path = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\Download" #location of files
-out_file = "test_append.csv" # output file name
+out_file = "temp_upload.csv" # output file name
 # if file path not included, places cleaned file with data
 
 #constants (regex)
@@ -75,6 +76,9 @@ def main():
     #output file if possible
     if not(full_file is None):
         full_file.to_csv(out_file, index = False)
+    bulk_upload(data_path, "econandstuff.com", "demp", "PurpleAir", out_file)
+
+
 ## New Helpers
 
 
@@ -154,6 +158,7 @@ def get_Secondary (name, files):
     #further subset to primary
     subset = exp_Matches(secondary,subset)
     return subset
+
 
 
 if __name__ == '__main__':
