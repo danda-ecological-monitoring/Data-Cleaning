@@ -17,7 +17,7 @@ import getpass as gp
 import sys
 import pandas as pd
 
-def bulk_upload(path, domain,db,tab,file):
+def bulk_upload(path, domain,db,tab,file, user, password):
     """The domain is the domain or ip of server
     bb is relevant database
     tab is the relevanant table name
@@ -25,8 +25,6 @@ def bulk_upload(path, domain,db,tab,file):
 
     os.chdir(path)
 
-    user = gp.getpass(prompt = "User:")
-    password = gp.getpass(prompt = "Password:")
     df =file
 
     #create the engine
@@ -46,7 +44,7 @@ def bulk_upload(path, domain,db,tab,file):
     delete from {tab}
     Where Sensor = '';""".format(df= df, tab=tab, db = db))
 
-    print(script)
+    #print(script)
     connection.execute(text("SHOW SESSION VARIABLES LIKE 'wait_timeout';"))
     connection.execute(script)
     connection.execute(text("set SQL_SAFE_UPDATES = 0"))

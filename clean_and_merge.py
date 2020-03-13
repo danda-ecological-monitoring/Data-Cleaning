@@ -26,12 +26,22 @@ import sensor_detail as sd
 import os
 import regex
 from db_connect import bulk_upload
+import getpass as gp
 
 #input
 sensor_dict = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\sensor_dict.txt" # this is a map of sensor names and ids
 data_path = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\Download" #location of files
 out_file = "temp_upload.csv" # output file name
 # if file path not included, places cleaned file with data
+
+#database details
+domain = "econandstuff.com"
+database ="demp"
+table = "PurpleAir"
+
+#login details
+user = gp.getpass(prompt = "User:")
+password = gp.getpass(prompt = "Password:") #do NOT hardcode.
 
 #constants (regex)
 #copied from data_cleaning_raw in geog
@@ -76,7 +86,7 @@ def main():
     #output file if possible
     if not(full_file is None):
         full_file.to_csv(out_file, index = False)
-    bulk_upload(data_path, "econandstuff.com", "demp", "PurpleAir", out_file)
+    bulk_upload(data_path, domain, database, table, out_file, user, password)
 
 
 ## New Helpers
@@ -98,6 +108,53 @@ def a_primary(name, file_list):
     clean[sensor_key] = sensor_map[name]
     return clean
 
+def a_secondary(name, file_list):
+    """takes a site name, identifies a secondary, and reads it in
+    formats/ cleans the data, then
+    goes ahead and adds the sensor name while a it. """
+    #id a primary and read in
+    prime = get_Secondary(name, file_list)
+    #identify a and b
+    #assume no duplicates
+    a =exp_Matches(purpleA, prime)[0]
+    df = pd.read_csv(a)
+    df = f.trim_frame(df)
+    form = sd.PurpleAirFormat() # needs to be updated
+    clean = f.unchecked_format(df, form)
+    clean[sensor_key] = sensor_map[name]
+    return clean
+
+def b_primary(name, file_list):
+    """takes a site name, identifies a primary, and reads it in
+    formats/ cleans the data, then
+    goes ahead and adds the sensor name while a it. """
+    #id a primary and read in
+    prime = get_Primary(name, file_list)
+    #identify a and b
+    #assume no duplicates
+    a =exp_Matches(purpleB, prime)[0]
+    df = pd.read_csv(a)
+    df = f.trim_frame(df)
+    form = sd.PurpleAirFormat() #needs to be updated
+    clean = f.unchecked_format(df, form)
+    clean[sensor_key] = sensor_map[name]
+    return clean
+
+def b_secondary(name, file_list):
+    """takes a site name, identifies a primary, and reads it in
+    formats/ cleans the data, then
+    goes ahead and adds the sensor name while a it. """
+    #id a primary and read in
+    prime = get_Secondary(name, file_list)
+    #identify a and b
+    #assume no duplicates
+    a =exp_Matches(purpleB, prime)[0]
+    df = pd.read_csv(a)
+    df = f.trim_frame(df)
+    form = sd.PurpleAirFormat() #needs to be updated
+    clean = f.unchecked_format(df, form)
+    clean[sensor_key] = sensor_map[name]
+    return clean
 ###############################################################################
 ## Helper Functions copied from data_cleaning.py, modified as needed
 
@@ -112,7 +169,6 @@ def is_Outdoor(file):
     if sub == "outside":
         loc = True
     return loc
-
 
 def is_Purple(file_name):
     """ A function that takes a file name, and checks if it follows the naming
@@ -158,7 +214,6 @@ def get_Secondary (name, files):
     #further subset to primary
     subset = exp_Matches(secondary,subset)
     return subset
-
 
 
 if __name__ == '__main__':
