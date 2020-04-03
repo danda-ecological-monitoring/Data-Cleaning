@@ -37,7 +37,6 @@ out_file = "temp_upload.csv" # output file name
 #database details
 domain = "econandstuff.com"
 database ="demp"
-table = "PurpleAir"
 
 #login details
 user = gp.getpass(prompt = "User:")
@@ -58,9 +57,15 @@ temp_map = pd.read_csv(sensor_dict, sep = ';')
 sensor_map = dict(zip(temp_map["Sensor Name"],temp_map["ID"]))
 sensor_key = "Sensor"
 
-
 ### Functions
 def main():
+    #structure of key: (fuunction reference, format object, table)
+    #where table is representd as a string
+    table_map = {"a_primary":(a_primary,sd.PurpleAirFormat,"PurpleAir","temp_table_1.csv"),\
+                "a_secondary":(a_secondary,sd.PA_A_Secondary,"PA_A_Secondary","temp_table_2.csv"),\
+                "b_primary":(b_primary,sd.PA_B_Primary,"PA_B_Primary","temp_table_3.csv"),\
+                "b_secondary":(a_secondary,sd.PA_B_Secondary,"PA_B_Secondary", "temp_table_4.csv")}
+
     os.chdir(data_path)
     all_files = os.listdir(data_path)
 
@@ -73,10 +78,22 @@ def main():
             name = file.split(" (")[0]
             site_set.add(name)
 
-    #loop over the site set
+    type_set = table_map.values()
+    for thing in type_set:
+        process_upload(thing, site_set, all_files)
+
+## New Helpers
+def process_upload(typo, site_set, file_list):
+    """Where type is an object from table_map, and this finds all associated
+    data, cleans it, and uploads to the appropriate table. No return """
+    out_file = typo[3]
+    for site in site_set:
+        new_data = typo[0](site, file_list,typo[1]())
+
+        #loop over the site set
     full_file = None
     for site in site_set:
-        site_file = a_primary(site,all_files)
+        site_file = typo[0](site,file_list,typo[1]())
         if not(site_file is None):
             if full_file is None:
                 full_file = site_file
@@ -86,13 +103,11 @@ def main():
     #output file if possible
     if not(full_file is None):
         full_file.to_csv(out_file, index = False)
-    bulk_upload(data_path, domain, database, table, out_file, user, password)
+    bulk_upload(data_path, domain, database, typo[2], out_file, user, password)
 
 
-## New Helpers
 
-
-def a_primary(name, file_list):
+def a_primary(name, file_list, form):
     """takes a site name, identifies a primary, and reads it in
     formats/ cleans the data, then
     goes ahead and adds the sensor name while a it. """
@@ -103,12 +118,11 @@ def a_primary(name, file_list):
     a =exp_Matches(purpleA, prime)[0]
     df = pd.read_csv(a)
     df = f.trim_frame(df)
-    form = sd.PurpleAirFormat()
     clean = f.unchecked_format(df, form)
     clean[sensor_key] = sensor_map[name]
     return clean
 
-def a_secondary(name, file_list):
+def a_secondary(name, file_list, form):
     """takes a site name, identifies a secondary, and reads it in
     formats/ cleans the data, then
     goes ahead and adds the sensor name while a it. """
@@ -119,12 +133,11 @@ def a_secondary(name, file_list):
     a =exp_Matches(purpleA, prime)[0]
     df = pd.read_csv(a)
     df = f.trim_frame(df)
-    form = sd.PurpleAirFormat() # needs to be updated
     clean = f.unchecked_format(df, form)
     clean[sensor_key] = sensor_map[name]
     return clean
 
-def b_primary(name, file_list):
+def b_primary(name, file_list, form):
     """takes a site name, identifies a primary, and reads it in
     formats/ cleans the data, then
     goes ahead and adds the sensor name while a it. """
@@ -135,12 +148,11 @@ def b_primary(name, file_list):
     a =exp_Matches(purpleB, prime)[0]
     df = pd.read_csv(a)
     df = f.trim_frame(df)
-    form = sd.PurpleAirFormat() #needs to be updated
     clean = f.unchecked_format(df, form)
     clean[sensor_key] = sensor_map[name]
     return clean
 
-def b_secondary(name, file_list):
+def b_secondary(name, file_list, form):
     """takes a site name, identifies a primary, and reads it in
     formats/ cleans the data, then
     goes ahead and adds the sensor name while a it. """
@@ -151,7 +163,6 @@ def b_secondary(name, file_list):
     a =exp_Matches(purpleB, prime)[0]
     df = pd.read_csv(a)
     df = f.trim_frame(df)
-    form = sd.PurpleAirFormat() #needs to be updated
     clean = f.unchecked_format(df, form)
     clean[sensor_key] = sensor_map[name]
     return clean

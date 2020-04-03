@@ -58,6 +58,50 @@ class LaserEggFormat(SensorFormat):
 		return df
 
 class PurpleAirFormat(SensorFormat):
+    raw_columns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
+		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'RSSI_dbm', \
+		'Temperature_F','Humidity_%', 'PM2.5_CF_1_ug/m3'})
+    formatted_columns = ExpectedColumns({'Time', 'entry_id', 'PM1.0', 'PM2.5', 'PM10.0', \
+		'Uptime', 'ADC','Temperature', 'Humidity', 'PM2.5_ATM'})
+    column_map = {'created_at':'Time', \
+				'Temperature_F':'Internal_Temperature', \
+				'PM1.0_CF1_ug/m3':'PM1.0',\
+				'PM2.5_CF1_ug/m3':'PM2.5',\
+				'PM10.0_CF1_ug/m3':'PM10.0',\
+				'Humidity_%':'Humidity',\
+				'UptimeMinutes':'Uptime',\
+				r'PM2.5_ATM_ug/m3':'PM2.5_ATM'}
+    time_zone = 'UTC'
+    sensor_key = "purple air"
+
+    @classmethod
+    def data_transform(cls,df):
+        df['Time']=dateConvert(df['Time'],cls.time_zone)
+        df['Internal_Temperature'] = toCelcius(df['Internal_Temperature'])
+        return df
+
+class PA_A_Secondary(SensorFormat):
+    raw_columns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
+		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'RSSI_dbm', \
+		'Temperature_F','Humidity_%', 'PM2.5_CF_1_ug/m3'})
+    formatted_columns = ExpectedColumns({'Time', 'entry_id', 'PM1.0', 'PM2.5', 'PM10.0', \
+		'Uptime', 'ADC','Temperature', 'Humidity', 'PM2.5_ATM'})
+    column_map = {'created_at':'Time', \
+				'Temperature_F':'Internal_Temperature', \
+				'PM1.0_CF1_ug/m3':'PM1.0',\
+				'PM2.5_CF1_ug/m3':'PM2.5',\
+				'PM10.0_CF1_ug/m3':'PM10.0',\
+				'Humidity_%':'Humidity',\
+				'UptimeMinutes':'Uptime',\
+				r'PM2.5_ATM_ug/m3':'PM2.5_ATM'}
+    time_zone = 'UTC'
+    sensor_key = "pa_a_secondary"
+    @classmethod
+    def data_transform(cls,df):
+        df['Time']=dateConvert(df['Time'],cls.time_zone)
+        return df
+
+class PA_B_Primary(SensorFormat):
 	raw_columns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
 		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'RSSI_dbm', \
 		'Temperature_F','Humidity_%', 'PM2.5_CF_1_ug/m3'})
@@ -72,12 +116,31 @@ class PurpleAirFormat(SensorFormat):
 				'UptimeMinutes':'Uptime',\
 				r'PM2.5_ATM_ug/m3':'PM2.5_ATM'}
 	time_zone = 'UTC'
-	sensor_key = "purple air"
-
+	sensor_key = "pa_b_primary"
 	@classmethod
 	def data_transform(cls,df):
 		df['Time']=dateConvert(df['Time'],cls.time_zone)
-		df['Internal_Temperature'] = toCelcius(df['Internal_Temperature'])
+		return df
+
+class PA_B_Secondary(SensorFormat):
+	raw_columns = ExpectedColumns({'created_at', 'entry_id', 'PM1.0_CF_ATM_ug/m3', \
+		'PM2.5_CF_ATM_ug/m3','PM10.0_CF_ATM_ug/m3', 'UptimeMinutes', 'RSSI_dbm', \
+		'Temperature_F','Humidity_%', 'PM2.5_CF_1_ug/m3'})
+	formatted_columns = ExpectedColumns({'Time', 'entry_id', 'PM1.0', 'PM2.5', 'PM10.0', \
+		'Uptime', 'ADC','Temperature', 'Humidity', 'PM2.5_ATM'})
+	column_map = {'created_at':'Time', \
+				'Temperature_F':'Internal_Temperature', \
+				'PM1.0_CF1_ug/m3':'PM1.0',\
+				'PM2.5_CF1_ug/m3':'PM2.5',\
+				'PM10.0_CF1_ug/m3':'PM10.0',\
+				'Humidity_%':'Humidity',\
+				'UptimeMinutes':'Uptime',\
+				r'PM2.5_ATM_ug/m3':'PM2.5_ATM'}
+	time_zone = 'UTC'
+	sensor_key = "pa_b_secondary"
+	@classmethod
+	def data_transform(cls,df):
+		df['Time']=dateConvert(df['Time'],cls.time_zone)
 		return df
 
 
