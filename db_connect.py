@@ -51,6 +51,30 @@ def bulk_upload(path, domain,db,tab,file, user, password):
     connection.execute(script2)
     connection.execute(text("set SQL_SAFE_UPDATES = 1"))
 
+def get_sensor_dict(domain,db,tab, user, password):
+    '''Returns a dictionary that maps between the Purple air name for a sensor,
+    and our database key for said sensor
+    In the case of our database, this is meant to pull the Name and ID columns
+    frrom Site_list
+    '''
+    #create the engine
+    engine = sql.create_engine("mysql://"+user+":"+password+"@"+domain+"/"+db)
+    connection = engine.connect()
+    metadata = sql.MetaData()
+    table= sql.Table(tab, metadata, autoload=True, autoload_with=engine)
+
+    query= text("""Select Name, ID from {tab}""".format(tab=tab, db = db))
+
+    result = connection.execute(query)
+    diction = {}
+    for row in result:
+        diction[row[0]] = row[1]
+
+    return diction
+
+
+
+
 
 def main():
     pass

@@ -25,12 +25,13 @@ import format as f
 import sensor_detail as sd
 import os
 import regex
-from db_connect import bulk_upload
+from db_connect import bulk_upload, get_sensor_dict
 import getpass as gp
+from tkinter import Tk, filedialog
 
+Tk().withdraw()
 #input
-sensor_dict = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\sensor_dict.txt" # this is a map of sensor names and ids
-data_path = r"C:\Users\Hannah Fritsch\Documents\DEMP_Code\Download" #location of files
+data_path = filedialog.askdirectory(title = "Please indicate where the data is located") #location of files
 out_file = "temp_upload.csv" # output file name
 # if file path not included, places cleaned file with data
 
@@ -53,8 +54,7 @@ purpleB = ".+\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv"
 primary = "[\D|\d]+([(].+[)]\s){2,2}Primary"
 secondary ="[\D|\d]+([(].+[)]\s){2,2}Secondary"
 
-temp_map = pd.read_csv(sensor_dict, sep = ';')
-sensor_map = dict(zip(temp_map["Sensor Name"],temp_map["ID"]))
+sensor_map = get_sensor_dict(domain,database,"Site_List", user, password)
 sensor_key = "Sensor"
 
 ### Functions
