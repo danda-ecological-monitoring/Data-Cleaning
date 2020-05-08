@@ -1,0 +1,14 @@
+CREATE TABLE `PurpleAir` (
+  `Time` datetime NOT NULL,
+  `entry_id` int(11) DEFAULT NULL,
+  `PM1.0` double DEFAULT NULL,
+  `PM2.5` double DEFAULT NULL,
+  `PM10.0` double DEFAULT NULL,
+  `Uptime` int(11) DEFAULT NULL,
+  `ADC` smallint(6) DEFAULT NULL,
+  `Internal_Temperature` float DEFAULT NULL,
+  `Humidity` smallint(6) DEFAULT NULL,
+  `PM2.5_ATM` double DEFAULT NULL,
+  `Sensor` varchar(45) NOT NULL,
+  UNIQUE KEY `sensor_time` (`Sensor`,`Time`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

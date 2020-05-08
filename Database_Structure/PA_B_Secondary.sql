@@ -1,0 +1,14 @@
+CREATE TABLE `PA_B_Secondary` (
+  `Time` datetime NOT NULL,
+  `entry_id` int(11) DEFAULT NULL,
+  `0.3um_B` float DEFAULT NULL,
+  `0.5um_B` float DEFAULT NULL,
+  `1.0um_B` float DEFAULT NULL,
+  `2.5um_B` float DEFAULT NULL,
+  `5.0um_B` float DEFAULT NULL,
+  `10.0um_B` float DEFAULT NULL,
+  `PM1.0_ATM_B` double DEFAULT NULL,
+  `PM10_ATM_B` double DEFAULT NULL,
+  `Sensor` varchar(45) NOT NULL,
+  UNIQUE KEY `sensor_time` (`Sensor`,`Time`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
