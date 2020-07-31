@@ -72,10 +72,10 @@ def main():
     site_set = set()
 
     #select channel a files to pull site names
-    #update site_set
     for file in all_files:
-        if is_Purple(file) and not(is_B(file)):
-            name = file.split(" (")[0]
+        if is_Purple(file) and is_B(file):
+            name = regex.split("\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv",file)[0].strip()
+            print(name)
             site_set.add(name)
 
     type_set = table_map.values()
