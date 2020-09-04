@@ -76,7 +76,6 @@ def main():
         if is_Purple(file) and is_B(file):
             name = regex.split("\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv",file)[0].strip()
             print(name)
-            site_set.add(name)
 
     type_set = table_map.values()
     for thing in type_set:
@@ -85,7 +84,8 @@ def main():
 ## New Helpers
 def process_upload(typo, site_set, file_list):
     """Where type is an object from table_map, and this finds all associated
-    data, cleans it, and uploads to the appropriate table. No return """
+    data, cleans it, and uploads to the appropriate table. No return
+    Also adds hour and date columns to the file before upload"""
     out_file = typo[3]
     for site in site_set:
         new_data = typo[0](site, file_list,typo[1]())
@@ -102,6 +102,8 @@ def process_upload(typo, site_set, file_list):
 
     #output file if possible
     if not(full_file is None):
+        full_file['Hour'] = full_file['Time'].hour # adding an hour and date column
+        full_file['Date'] = full_file['Time'].date
         full_file.to_csv(out_file, index = False)
     bulk_upload(data_path, domain, database, typo[2], out_file, user, password)
 
@@ -208,7 +210,9 @@ def get_Primary (name, files):
     """ Given the cleaned site name, and a list of files
     this returns a list that contains
     the primary files for the sensor."""
-    subset = exp_Matches (name, files)
+    #account for parentheses
+    regname = regex.sub('[)]','[)]',regex.sub('[(]', '[(]',name))
+    subset = exp_Matches (regname, files)
     #verify correct file type
     subset = exp_Matches(purple,subset)
     #further subset to primary
@@ -219,7 +223,8 @@ def get_Secondary (name, files):
     """ Given the cleaned site name, and a list of files
     this returns a list that contains
     the primary files for the sensor."""
-    subset = exp_Matches (name, files)
+    regname = regex.sub('[)]','[)]',regex.sub('[(]', '[(]',name))
+    subset = exp_Matches (regname, files)
     #verify correct file type
     subset = exp_Matches(purple,subset)
     #further subset to primary
