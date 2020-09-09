@@ -28,23 +28,29 @@ import regex
 from db_connect import bulk_upload, get_sensor_dict
 import getpass as gp
 from tkinter import Tk, filedialog
+import tkinter as tk
 
-Tk().withdraw()
-#input
-data_path = filedialog.askdirectory(title = "Please indicate where the data is located") #location of files
-out_file = "temp_upload.csv" # output file name
-# if file path not included, places cleaned file with data
+######Initializing login variables
+domain = ""
+database = ""
+user = ""
+password = ""
+data_path = ""
 
-#database details
-domain = "dempnsc.unm.edu"
-database ="dempnsc_demp"
+#################################################################################################
+#################################################################################################
+#USER INPUTS
 
-#login details
-user = gp.getpass(prompt = "User:")
-password = gp.getpass(prompt = "Password:") #do NOT hardcode.
+####
 
-#constants (regex)
-#copied from data_cleaning_raw in geog
+
+########
+##OTHER INPUTS
+
+
+################################################################################################
+################################################################################################
+#CONSTANTS (regex)
 #file strings for unaveraged data
 purple = r".+[(].+[)]\s[(].+[)](\s\S+){5}[.]csv"
 purpleA = ".+\s[(].*side[)]\s[(].+[)](\s\S+){5}[.]csv" # could maybe be less explicit
@@ -54,11 +60,72 @@ purpleB = ".+\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv"
 primary = "[\D|\d]+([(].+[)]\s){2,2}Primary"
 secondary ="[\D|\d]+([(].+[)]\s){2,2}Secondary"
 
-sensor_map = get_sensor_dict(domain,database,"Site_List", user, password)
+sensor_map = ""
 sensor_key = "Sensor"
 
-### Functions
+
+
+################################################################################################
+################################################################################################
+### FUNCTIONS
 def main():
+    ###GUI
+
+    # layout constants
+    padding = 5
+    root = tk.Tk()
+    entry_width = 30
+    
+    entries = tk.Frame(root)
+    buttons = tk.Frame(root)
+    header = tk.Frame(root)
+
+    #### key variable definitions
+    domain_ent = tk.Entry(entries, width = entry_width)
+    database_ent = tk.Entry(entries, width = entry_width)
+    user_ent = tk.Entry(entries,width = entry_width)
+    password_ent = tk.Entry(entries, show = "*",width = entry_width)
+    
+    head_text= tk.Label(header, text = "Login for Air Quality Database", \
+                    pady = padding, padx = padding, font = "TKdefaultfont 15")
+    
+    
+    def login():
+        global domain, database,user,password,data_path
+        domain = domain_ent.get()
+        database = database_ent.get()
+        user = user_ent.get()
+        password = password_ent.get()
+        data_path = filedialog.askdirectory(title = "Please indicate where the data is located")
+        upload()
+    
+    submit = tk.Button(buttons, text = "Submit" , command = login)
+    help_button = tk.Button(buttons, text = "Help")
+    about = tk.Button(buttons, text = "About")
+
+    header.grid(row = 0)
+    
+    head_text.grid()
+    
+    entries.grid(row = 1)
+    
+    tk.Label(entries, text="Database").grid(row=1, sticky = 'E')
+    tk.Label(entries, text="Domain").grid(row=2, sticky = 'E')
+    tk.Label(entries, text="User").grid(row=3, sticky = 'E')
+    tk.Label(entries, text="Password").grid(row=4, sticky = 'E')
+    
+    buttons.grid(row = 2)
+    
+    database_ent.grid(row=1, column=1, pady = padding, padx = padding, columnspan = 2)
+    domain_ent.grid(row=2, column=1, pady = padding, padx = padding,  columnspan = 2) 
+    user_ent.grid(row=3, column=1, pady = padding, padx = padding,  columnspan = 2)
+    password_ent.grid(row=4, column=1, pady = padding, padx = padding,  columnspan = 2)
+    submit.grid(row = 5, column = 1, pady = padding, padx= padding)
+
+
+def upload():
+    global sensor_map
+    sensor_map = get_sensor_dict(domain,database,"Site_List", user, password)
     #structure of key: (fuunction reference, format object, table)
     #where table is representd as a string
     table_map = {"a_primary":(a_primary,sd.PurpleAirFormat,"PurpleAir","temp_table_1.csv"),\
@@ -89,7 +156,8 @@ def main():
     for thing in type_set:
         process_upload(thing, site_set, all_files)
 
-## New Helpers
+#############################################################################################################
+#### HELPER FUNCTIONS
 def process_upload(typo, site_set, file_list):
     """Where type is an object from table_map, and this finds all associated
     data, cleans it, and uploads to the appropriate table. No return
