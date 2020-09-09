@@ -49,8 +49,8 @@ domain.grid(row=2, column=1, pady = padding, padx = padding,  columnspan = 2)
 user.grid(row=3, column=1, pady = padding, padx = padding,  columnspan = 2)
 password.grid(row=4, column=1, pady = padding, padx = padding,  columnspan = 2)
 submit.grid(row = 5, column = 1, pady = padding, padx= padding)
-about.grid(row = 5, column = 2, pady = padding, padx= padding)
-help_button.grid(row = 5, column = 3, pady = padding, padx= padding)
+#about.grid(row = 5, column = 2, pady = padding, padx= padding)
+#help_button.grid(row = 5, column = 3, pady = padding, padx= padding)
 
 
 root.mainloop()

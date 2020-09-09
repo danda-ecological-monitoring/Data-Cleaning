@@ -75,8 +75,15 @@ def main():
     for file in all_files:
         if is_Purple(file) and is_B(file):
             name = regex.split("\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv",file)[0].strip()
-            print(name)
             site_set.add(name)
+
+    # LIST DETECTED SITES
+    print("\nList of all detected sites:")
+    if len(site_set)== 0:
+        print('The program detects no files')
+    else:
+        print("detected sites")
+        print(site_set)
 
     type_set = table_map.values()
     for thing in type_set:
@@ -90,25 +97,22 @@ def process_upload(typo, site_set, file_list):
     out_file = typo[3]
     for site in site_set: 
         new_data = typo[0](site, file_list,typo[1]())
-        print("list of sites:")
 
     #see what is in site set
-    if len(site_set)== 0:
-        print('The program detects no files')
-    else:
-        print(site_set)
+    print("\nFor table " + typo[2] + ":")
 
         #loop over the site set
     full_file = None
     for site in site_set:
-        print(site)
-        print(typo[2])
+        print("processing " + site)
         site_file = typo[0](site,file_list,typo[1]())
         if not(site_file is None):
             if full_file is None:
                 full_file = site_file
             else:
                 full_file = full_file.append(site_file)
+        else:
+            print("No file detected for "+site) 
 
     #output file if possible
     if not(full_file is None):
@@ -117,7 +121,6 @@ def process_upload(typo, site_set, file_list):
         full_file.to_csv(out_file, index = False)
         bulk_upload(data_path, domain, database, typo[2], out_file, user, password)
     else:
-        print("for table " + typo[2]+ ":")
         print("No cleaned data to upload. If data was expected, please check that names match")
 
 
