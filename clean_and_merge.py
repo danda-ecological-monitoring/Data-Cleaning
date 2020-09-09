@@ -36,8 +36,8 @@ out_file = "temp_upload.csv" # output file name
 # if file path not included, places cleaned file with data
 
 #database details
-domain = "econandstuff.com"
-database ="demp"
+domain = "dempnsc.unm.edu"
+database ="dempnsc_demp"
 
 #login details
 user = gp.getpass(prompt = "User:")
@@ -76,6 +76,7 @@ def main():
         if is_Purple(file) and is_B(file):
             name = regex.split("\sB\s[(]undefined[)]\s[(].+[)](\s\S+){5}[.]csv",file)[0].strip()
             print(name)
+            site_set.add(name)
 
     type_set = table_map.values()
     for thing in type_set:
@@ -87,12 +88,21 @@ def process_upload(typo, site_set, file_list):
     data, cleans it, and uploads to the appropriate table. No return
     Also adds hour and date columns to the file before upload"""
     out_file = typo[3]
-    for site in site_set:
+    for site in site_set: 
         new_data = typo[0](site, file_list,typo[1]())
+        print("list of sites:")
+
+    #see what is in site set
+    if len(site_set)== 0:
+        print('The program detects no files')
+    else:
+        print(site_set)
 
         #loop over the site set
     full_file = None
     for site in site_set:
+        print(site)
+        print(typo[2])
         site_file = typo[0](site,file_list,typo[1]())
         if not(site_file is None):
             if full_file is None:
@@ -102,10 +112,14 @@ def process_upload(typo, site_set, file_list):
 
     #output file if possible
     if not(full_file is None):
-        full_file['Hour'] = full_file['Time'].hour # adding an hour and date column
-        full_file['Date'] = full_file['Time'].date
+        full_file['Hour'] = pd.DatetimeIndex(full_file['Time']).hour  # adding an hour and date column
+        full_file['Date'] = pd.DatetimeIndex(full_file['Time']).date
         full_file.to_csv(out_file, index = False)
-    bulk_upload(data_path, domain, database, typo[2], out_file, user, password)
+        bulk_upload(data_path, domain, database, typo[2], out_file, user, password)
+    else:
+        print("for table " + typo[2]+ ":")
+        print("No cleaned data to upload. If data was expected, please check that names match")
+
 
 
 
@@ -121,7 +135,6 @@ def a_primary(name, file_list, form):
     df = pd.read_csv(a)
     df = f.trim_frame(df)
     clean = f.unchecked_format(df, form)
-    clean[sensor_key] = sensor_map[name]
     return clean
 
 def a_secondary(name, file_list, form):
