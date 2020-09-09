@@ -206,6 +206,7 @@ def a_primary(name, file_list, form):
     df = pd.read_csv(a)
     df = f.trim_frame(df)
     clean = f.unchecked_format(df, form)
+    clean[sensor_key] = sensor_map[name]
     return clean
 
 def a_secondary(name, file_list, form):
